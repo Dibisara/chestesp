@@ -9,6 +9,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Unpack
         run: unzip -q *.zip
+      - name: Allow older Fabric Loader
+        run: sed -i 's/>=0.19.5/>=0.18.0/' chest-esp/src/main/resources/fabric.mod.json
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
