@@ -8,21 +8,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Unpack
-        run: unzip -q *.zip
-      - name: Allow older Fabric Loader
-        run: sed -i 's/>=0.19.5/>=0.18.0/' chest-esp/src/main/resources/fabric.mod.json
+        run: |
+          for f in *.zip; do unzip -q -o "$f"; done
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 25
-      - name: Build
-        working-directory: chest-esp
+      - name: Build all mods
         run: |
-          chmod +x gradlew
-          ./gradlew build
+          for d in */; do
+            if [ -f "${d}gradlew" ]; then
+              sed -i 's/>=0.19.5/>=0.18.0/' "${d}src/main/resources/fabric.mod.json"
+              (cd "$d" && chmod +x gradlew && ./gradlew build --no-daemon)
+            fi
+          done
       - uses: actions/upload-artifact@v4
         with:
-          name: chestesp
+          name: mods
           path: |
-            chest-esp/build/libs/*.jar
-            !chest-esp/build/libs/*-sources.jar
+            */build/libs/*.jar
+            !*/build/libs/*-sources.jar
