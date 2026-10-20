@@ -1,0 +1,26 @@
+name: build
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unpack
+        run: unzip -q *.zip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Build
+        working-directory: chest-esp
+        run: |
+          chmod +x gradlew
+          ./gradlew build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chestesp
+          path: |
+            chest-esp/build/libs/*.jar
+            !chest-esp/build/libs/*-sources.jar
